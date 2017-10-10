@@ -6,12 +6,17 @@ class TicTacToeContainer extends Component {
     super(props);
     this.state = {
       isUserX: true,
+      reset: true,
       boxesStatus: [null, null, null, null, null, null, null, null, null]
     }
     this.toggleUser = this.toggleUser.bind(this);
     this.updateBoxValue = this.updateBoxValue.bind(this);
     this.checkIfUserWon = this.checkIfUserWon.bind(this);
     this.showGameStatus = this.showGameStatus.bind(this);
+  }
+
+  componentDidMount() {
+    this.setState({reset: false});
   }
 
   toggleUser() {
@@ -32,6 +37,7 @@ class TicTacToeContainer extends Component {
     ];
     let valToCheck = this.state.isUserX ? "X" : "O";
     let boxValArray = [];
+    let won = false;
 
     this.state.boxesStatus.forEach(function(box, index){
       if(valToCheck === box) {
@@ -46,38 +52,62 @@ class TicTacToeContainer extends Component {
           if(line.includes(boxVal)) {
             ++counter;
             if(counter === 3) {
-              that.showGameStatus();
+              that.showGameStatus(false);
+              setTimeout(function() {
+                that.resetState();
+              }, 100);
+              won = true;
             }
           }
         })
       });
     }
+
+    if(!won && !this.state.boxesStatus.includes(null)) {
+      that.showGameStatus(true);
+    }
+  }
+
+  resetState() {
+    this.setState({boxesStatus: [null, null, null, null, null, null, null, null, null], isUserX: true, reset: true});
   }
 
   updateBoxValue(ind, val) {
     let boxesStatus = this.state.boxesStatus;
     boxesStatus[ind] = val;
-    this.setState({boxesStatus: boxesStatus});
+    this.setState({boxesStatus: boxesStatus, reset: false});
   }
 
-  showGameStatus() {
-    if(this.state.isUserX) {
-      alert("X Won!");
+  showGameStatus(isDraw) {
+    let that = this;
+    if(isDraw) {
+      setTimeout(function() {
+        if(window.confirm("Draw, Play again!") === true) {
+          that.resetState();
+        }
+      }, 100);
+    } else if(this.state.isUserX) {
+      setTimeout(function() {
+        alert("X Won!");
+      }, 100);
     } else {
-      alert("O Won!");
+      setTimeout(function() {
+        alert("O Won!");
+      }, 100);
     }
   }
 
   boxes() {
     let boxes = [];
     for(var i = 0; i < 9; i++) {
-      boxes.push(<EachBox key={i} boxNum={i} isUserX={this.state.isUserX} toggleUser={this.toggleUser} updateBoxValue={this.updateBoxValue} checkIfUserWon={this.checkIfUserWon}></EachBox>);
+      boxes.push(<EachBox key={i} boxNum={i} isUserX={this.state.isUserX} toggleUser={this.toggleUser} updateBoxValue={this.updateBoxValue} checkIfUserWon={this.checkIfUserWon} reset={this.state.reset}></EachBox>);
     }
     return boxes;
   }
 
   render() {
-    let boxes = this.boxes();
+    let boxes = [];
+    boxes = this.boxes();
     return (
       <div className="container">
         {boxes}
