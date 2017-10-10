@@ -7,7 +7,9 @@ class TicTacToeContainer extends Component {
     this.state = {
       isUserX: true,
       reset: true,
-      boxesStatus: [null, null, null, null, null, null, null, null, null]
+      boxesStatus: [null, null, null, null, null, null, null, null, null],
+      xWon: 0,
+      oWon: 0
     }
     this.toggleUser = this.toggleUser.bind(this);
     this.updateBoxValue = this.updateBoxValue.bind(this);
@@ -88,11 +90,13 @@ class TicTacToeContainer extends Component {
       }, 100);
     } else if(this.state.isUserX) {
       setTimeout(function() {
-        alert("X Won!");
+        that.setState({xWon: that.state.xWon + 1});
+        alert("X has Won!");
       }, 100);
     } else {
       setTimeout(function() {
-        alert("O Won!");
+        that.setState({oWon: that.state.oWon + 1})
+        alert("O has Won!");
       }, 100);
     }
   }
@@ -109,8 +113,14 @@ class TicTacToeContainer extends Component {
     let boxes = [];
     boxes = this.boxes();
     return (
-      <div className="container">
-        {boxes}
+      <div>
+        <div style={{marginTop: '10px'}}>
+          <div>X Won: {this.state.xWon} </div>
+          <div>O Won: {this.state.oWon}</div>
+        </div>
+        <div className="container">
+          {boxes}
+        </div>
       </div>
     );
   }
